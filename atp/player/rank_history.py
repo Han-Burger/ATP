@@ -1,0 +1,2 @@
+class RankHistory(object):
+    pass
