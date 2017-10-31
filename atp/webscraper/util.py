@@ -8,7 +8,7 @@ def parse_date(str):
 def parse_rank(str):
     return int(re.search(r'\d+', str).group())
 
-def parse_table(str):
+def parse_rank_table(str):
     dateformat = r'^\d{4}\.\d{1,2}\.\d{1,2}$'
     return parse_date(str) if re.match(dateformat, str) else parse_rank(str)
 

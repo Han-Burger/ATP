@@ -1,6 +1,6 @@
-from atp.webscraper import player_rank_history_parser
-class Player(object):
+from atp.webscraper.webscraper import parse_player_rank_history
 
+class Player(object):
     def __init__(self, rank_history):
         """
         :param rank_history: a rank history dataframe
@@ -9,8 +9,8 @@ class Player(object):
 
     @classmethod
     def from_webpage(cls, url):
-        df = player_rank_history_parser(url)
-        return cls(df)
+        df = parse_player_rank_history(url)
+        return cls(rank_history = df)
 
     @classmethod
     def from_local(cls, path):

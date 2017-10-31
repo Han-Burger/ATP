@@ -1,25 +1,42 @@
 import requests
 from bs4 import BeautifulSoup
-from util import parse_table, load_header
-import json
+from atp.webscraper.util import parse_rank_table, load_header
 import pandas as pd
-rank_history_header = load_header('rank_history_df.json')
+import os
+rank_history_header = load_header(os.path.join(os.path.dirname(__file__), 'rank_history_df.json'))
+player_list_header = load_header(os.path.join(os.path.dirname(__file__), 'player_list_df.json'))
 
 
-def player_rank_history_parser(url):
+
+def parse_player_rank_history(url):
     """
     :param url: atp player raking history page url
     :return:
     """
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
-    rs = soup.find('div', attrs={'id': 'playerRankHistoryContainer'})
+    rs = soup.find('div', attrs = {'id': 'playerRankHistoryContainer'})
     tb = rs.find('tbody').find_all('tr')
-    mat = [[parse_table(d.text.strip()) for d in row.find_all('td')] for row in tb]
+    mat = [[parse_rank_table(d.text.strip()) for d in row.find_all('td')] for row in tb]
     return pd.DataFrame.from_records(mat, columns = rank_history_header)
 
 
 
+def parse_singles_player_list(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    rs = soup.find('div', attrs={'id': 'rankingDetailAjaxContainer'})
+    tb = rs.find('tbody').find_all('tr')
+    mat = [[d.text, d['href'], '/'.join(d['href'].split('/')[:-1] + ['rankings-history'])]
+           for row in tb for d in row.find('td', attrs = {'class': 'player-cell'}).find_all('a')]
+    return pd.DataFrame.from_records(mat, columns = player_list_header)
+
+
 if __name__ == '__main__':
-    url = r'http://www.atpworldtour.com/en/players/rafael-nadal/n409/rankings-history'
-    print (player_rank_history_parser(url))
+    # url = r'http://www.atpworldtour.com/en/players/rafael-nadal/n409/rankings-history'
+    # print (parse_player_rank_history(url))
+
+    url = r'https://www.atpworldtour.com/en/rankings/singles'
+    player_list = parse_singles_player_list(url)
+    atp_url = r'https://www.atpworldtour.com'
+    print (parse_player_rank_history(atp_url + player_list['ranking_history_link'][2]))
