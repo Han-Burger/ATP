@@ -1,1 +1,7 @@
 atp_env
+data
+.idea
+*.log
+*.pyc
+*.log
+*.ipynb
