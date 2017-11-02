@@ -18,7 +18,8 @@ def parse_player_rank_history(url):
     rs = soup.find('div', attrs = {'id': 'playerRankHistoryContainer'})
     tb = rs.find('tbody').find_all('tr')
     mat = [[parse_rank_table(d.text.strip()) for d in row.find_all('td')] for row in tb]
-    return pd.DataFrame.from_records(mat, columns = rank_history_header)
+    name = url.split('/')[-3].replace('-', ' ').title()
+    return name, pd.DataFrame.from_records(mat, columns = rank_history_header)
 
 
 
@@ -39,4 +40,6 @@ if __name__ == '__main__':
     url = r'https://www.atpworldtour.com/en/rankings/singles'
     player_list = parse_singles_player_list(url)
     atp_url = r'https://www.atpworldtour.com'
-    print (parse_player_rank_history(atp_url + player_list['ranking_history_link'][2]))
+    name, df = parse_player_rank_history(atp_url + player_list['ranking_history_link'][0])
+    print(df)
+    print(name)
