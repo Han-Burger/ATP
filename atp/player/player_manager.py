@@ -1,21 +1,38 @@
 from atp.player.player import Player
 from atp.webscraper.webscraper import parse_player_rank_history, parse_singles_player_list
+from urllib.parse import urljoin
+import logging
 
 class PlayerManager(object):
 
     @staticmethod
     def load_player_statistics():
-        url = r'https://www.atpworldtour.com/en/rankings/singles'
-        player_list = parse_singles_player_list(url)
+        player_list = parse_singles_player_list()
         atp_url = r'https://www.atpworldtour.com'
         players_rank_history =  {
                                     player_list.ix[i]['name']:
-                                    parse_player_rank_history(atp_url + player_list.ix[i]['ranking_history_link'])
+                                    parse_player_rank_history(urljoin(atp_url, player_list.ix[i]['ranking_history_link']))
                                     for i in range(len(player_list))
                                 }
         print(players_rank_history)
         return players_rank_history
 
+    @staticmethod
+    def write_all_players_rank_history_to_file(format = 'csv'):
+
+        func = {'csv': Player.write_player_rank_history_to_csv,
+                'pickle': Player.write_player_rank_history_to_pickle}
+
+        if format not in func:
+            logging.log('WARNING', 'Write file type not supported.')
+
+        player_list = parse_singles_player_list()
+        atp_url = r'https://www.atpworldtour.com'
+        for i in range(len(player_list)):
+            player = Player.build_from_webpage(urljoin(atp_url, player_list.ix[i]['ranking_history_link']))
+            func[format](player)
+
+
 
 if __name__ == '__main__':
-    PlayerManager.load_player_statistics()
+    PlayerManager.write_all_players_rank_history_to_file('pickle')

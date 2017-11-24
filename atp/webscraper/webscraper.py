@@ -22,8 +22,7 @@ def parse_player_rank_history(url):
     return name, pd.DataFrame.from_records(mat, columns = rank_history_header)
 
 
-
-def parse_singles_player_list(url):
+def parse_singles_player_list(url = r'https://www.atpworldtour.com/en/rankings/singles'):
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
     rs = soup.find('div', attrs={'id': 'rankingDetailAjaxContainer'})
