@@ -1,8 +1,11 @@
 from atp.webscraper.webscraper import parse_player_rank_history
+from atp.logger.logger import Logger
 import pandas as pd
 import os
 import pickle
-import logging
+
+logger = Logger('player').get()
+
 
 class Player(object):
     def __init__(self, name, rank_history):
@@ -51,7 +54,7 @@ class Player(object):
                     except EOFError:
                         return obj
         else:
-            # logging.log('WARNING', 'Player file cannot find.')
+            logger.warning("Player {name} pickle file not found.".format(name = name))
             return None
 
     @classmethod
@@ -63,7 +66,7 @@ class Player(object):
             df = pd.read_csv(url)
             return cls(name, df)
         else:
-            # logging.log('WARNING', 'Player file cannot find.')
+            logger.warning("Player {name} csv file not found.".format(name = name))
             return None
 
     @classmethod
@@ -71,9 +74,7 @@ class Player(object):
         obj = cls.build_from_pickle(name)
         if obj: return obj
         obj = cls.build_from_csv(name)
-        if obj: return obj
-        obj = cls.build_from_webpage()
-        return cls.build_from_csv(name)
+        return obj
 
     @classmethod
     def write_player_rank_history_to_pickle(cls, obj, name = None, path = None):
@@ -105,5 +106,5 @@ if __name__ == '__main__':
     # rn = Player.build_from_webpage(url)
     # print(rn.rank_history)
     # Player.write_player_rank_history_to_pickle(rn)
-    rn = Player.build('Roger Federer')
+    rn = Player.build('Random People')
     print(rn.rank_history)

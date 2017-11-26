@@ -1,7 +1,9 @@
 from atp.player.player import Player
 from atp.webscraper.webscraper import parse_player_rank_history, parse_singles_player_list
 from urllib.parse import urljoin
-import logging
+from atp.logger.logger import Logger
+
+logger = Logger('player_manager').get()
 
 class PlayerManager(object):
 
@@ -24,7 +26,7 @@ class PlayerManager(object):
                 'pickle': Player.write_player_rank_history_to_pickle}
 
         if format not in func:
-            logging.log('WARNING', 'Write file type not supported.')
+            logger.warning("Write file type not supported.")
 
         player_list = parse_singles_player_list()
         atp_url = r'https://www.atpworldtour.com'
@@ -35,4 +37,4 @@ class PlayerManager(object):
 
 
 if __name__ == '__main__':
-    PlayerManager.write_all_players_rank_history_to_file('pickle')
+    PlayerManager.write_all_players_rank_history_to_file('csv')
