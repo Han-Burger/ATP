@@ -35,6 +35,5 @@ class PlayerManager(object):
             func[format](player)
 
 
-
 if __name__ == '__main__':
     PlayerManager.write_all_players_rank_history_to_file('csv')
